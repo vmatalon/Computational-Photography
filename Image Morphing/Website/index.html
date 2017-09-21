@@ -1,0 +1,458 @@
+<html>
+    
+<head>
+    <script src="assets/js/jquery-1.9.1.js"></script>
+    <script src="assets/js/script.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700&subset=latin,greek-ext' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div id="modal">
+        <div id="modal-overlay">
+        </div>
+        <div id="modal-content"> 
+            <div id="container">
+                <div class="image-container">
+                    <img id="photo-modal" src=""/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="header">
+        <div id="project-name">
+            Project 5: Image Morphing
+        </div>
+        <div id="class-name">
+            CS194-26 | Fall 14
+        </div>
+        <div id="name">
+            Vanessa Matalon
+        </div>
+    </div>
+    <div id="content">
+        <div class="elem">
+            <div class="text-title">Introduction</div>
+            <div class="text">
+                The purpose of this project was to introduce the class to the concepts behind image morphing. A morph is a simultaneous warp of the image shapes, as defined by a set of corresponding points, and a cross-dissolve of the image colors.
+                <br/>In this project, we first compute the average face (not average of the faces) between two portraits. Next, we create animated illustrations of smooth transitions from one face to another. 
+				<br/>We then take what we learned from this and use it to solve a big data problem: Given a set of faces, what does the population mean look like? From this average face, we exemplify the difference between any individual and the mean. Lastly, we extrapolate from the population mean to create caricatures of faces. 
+			</div>
+        </div>
+		<div class="elem">
+			<div class="text-title">Algorithm</div>
+            <div class="text">
+				The reason why we need to warp the images in order to morph them is because we cannot assume that the shapes of the images are equivalent to one another. Instead, the convention is to match their features (i.e., nose to nose, eyes to eyes, etc) and use this information to compute local warps.
+				<br/>The image features are matched to one another by defining a set of corresponding points at the key feature points on the two images. 
+				<br/>In my project, I used 50 points or more because, generally speaking, the more points you have, the better the morph. 
+				<br/><br/>The next step is to compute a triangulation of these points that is consistent in both images. 
+				<br/>In my case, I chose to compute a <a href="http://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a> on the intermediate shape between the images, as was suggested in the project instructions. The average shape is computed by multiplying each set of points by 1/(number of images) and then adding them together. This triangulation is desirable for two reasons: first, it tends to avoid skinny triangles, which often are non-local and second, it does not favor one image shape over the other because it is taken from the average of the two shapes.
+				<br/><br/>The following step, is to warp each triangle in both images into the desired shape. Since these pictures are independent of one another, I warp each image in parallel to get a bit of a speedup. 
+				<br/>In order to warp these triangles into the desired shape, I do the following: create a list of the triangles each pixel belongs to; compute the affine transformation matrix by dividing the triangle coordinates in the image by the triangle coordinates in the warped image; create a map of the indices where the pixels in the warped image must be taken from the original image; since some of these values are likely to fall between several pixels, I interpolate the values of the pixels from in the original image as indicated by the pixel map to assign all pixel values in the final warped image (the pixel map that I created lets me do this all at once, but it must be done for each color channel separately).   
+				<br/><br/>Finally, the colors of the two images are computed with a weighted linear interpolation. This technique is referred to as a "cross-dissolve" between the two images. 
+			</div>
+		</div>
+		<div class="elem">
+            <div class="text-title">Midway Face</div>
+            <div class="text">
+                Before we computed a morph between two images, we were asked to compute the midway face between two images. 
+				</br></br>I first computed the average shape (as described above), warped both images into that shape, and finally cross-dissolved the colors.
+				</br></br>I chose these famous portraits by Steve McCurry because most of the features remain the same due to the fact that it is the same person over time. The vast majority of the points I selected were on the face for this reason (as you can see in the images that include the triangulations). This allows for a smooth transition between the faces. 
+				</br>The head scarves, on the other hand, do not transition as smoothly because these do not span a linear subspace. The position of the headscarf is too different on both faces to allow for a suave transition between these.
+            </div>
+			<div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/im1.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Afghan Girl
+                        </div>
+                        <div class="description-info">
+                            Original (1984)
+							</br>by Steve McCurry							
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/im1t.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Afghan Girl
+                        </div>
+						<div class="description-info">
+                            Triangulated						
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/im2.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Afghan Girl Revealed
+                        </div>
+                        <div class="description-info">
+                            Original (2002)
+							</br>by Steve McCurry
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/im2t.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Afghan Girl Revealed
+                        </div>
+						<div class="description-info">
+                            Triangulated						
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/midway_afghan.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Midway Afghan Girl
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/midwayt_afghan.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Midway Afghan Girl
+                    </div>
+                    <div class="description-info">
+                        Triangualted
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Morph Sequence</div>
+            <div class="text">
+                The morph sequence consists of 45 frames, each of which is shown for 1/30 of a second in the animated GIF. The GIF contains the morph forward and backwards, because this seemed to be the most appropriate way to display the sequence.
+				<br/><br/>They key to the morphing sequence are the weights that control both the warp and the dissolve fractions. The warp fraction dictates hoe much each image contributes to the shape that the images will be warped to, and the dissolve fraction determines the ratio of colors in the morphed frame. 
+				<br/>These fractions determine how much of each image will be present in each frame, and they are the only values that change from frame to frame. They take on 45 equally spaced values from 0 to 1. The first image's weight corresponds to (1-(current weight)) and the second's is (current weight).  
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/morph1.gif"/>
+                <div class="description">
+                    <div class="description-title">
+                        Afghan Girl Morph
+                    </div>
+					<div class="description-info">
+                        18 years in 1.5 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+		<div class="elem">
+            <div class="text-title">Average Faces</div>
+            <div class="text">
+                Having a set of annotated images makes life easy! I used a <a href="http://fei.edu.br/~cet/facedatabase.html">database of Brazilian Faces</a> made availabe by the Artificial Intelligence Laboratory of FEI in São Bernardo do Campo, São Paulo, Brazil. This database consists of 14 images of 200 individuals that are annotated manually for the same corresponding 46 points.
+                <br/>I added points corresponding to the 4 corners of every image so that I could make sure that every pixel was within a triangle. 
+                <br/>I chose to work with the non-similing women in the population. Below are some examples of the images I used from the database. 
+            </div>
+            <div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/b1.jpg"/>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/b1p.jpg"/>
+                    <div class="description">
+						<div class="description-info">
+                            Annotated points shown in red						
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/b2.jpg"/>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/b2p.jpg"/>
+                    <div class="description">
+						<div class="description-info">
+                            Annotated points shown in red
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text">
+                The process for computing the mean face of a population is threefold: first, compute the average shape of the population; second, warp each face into the average shape; last, cross-dissolve the warped faces to produce the average morphed image. 
+                <br/><br/>These are some faces warped to the average shape. Compare the first and third warped images to the original images directly above. 
+            </div>
+            <div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/bw3.jpg"/>
+                    <div class="description">
+						<div class="description-info">
+                            Warped to average shape							
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/bw1.jpg"/>
+                    <div class="description">
+						<div class="description-info">
+                            Warped to average shape							
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/bw2.jpg"/>
+                    <div class="description">
+						<div class="description-info">
+                            Warped to average shape							
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/bw4.jpg"/>
+                    <div class="description">
+						<div class="description-info">
+                            Warped to average shape							
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text">
+                This is the result of cross-dissolving all warped images to get the population average. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/averageb.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Average Brazilian Woman
+                    </div>
+                </div>
+            </div>
+            <div class="text">
+                Given the average face, we can now compare individuals to the mean. 
+                <br />Below, I show my original face compared to it warped to the average geometry and the average face warped to my geometry. 
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/im3_me.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My face
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/bme1.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My face warped to the average Brazilian woman geometry
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/bme2.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Average Brazilian woman face warped to my geometry
+                    </div>
+                </div>
+            </div>
+            <div class="text-title">Caricatures</div>
+            <div class="text">
+                In order to produce a caricature of my face I extrapolated from the mean by warping my face between my geometry and the average Brazilian woman's geometry using weights that are not in the range from 0 to 1. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/morph2.gif"/>
+                <div class="description">
+                    <div class="description-info">
+                        Caricature sequence: morphing towards population mean
+                        <br/>weights = [0,2]
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/morph2.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Caricature: morphing towards population mean
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/morph3.gif"/>
+                <div class="description">
+                    <div class="description-info">
+                        Caricature sequence: morphing away from population mean
+                        <br/>weights = [-2,0]
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/morph3.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Caricature: morphing away from population mean
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Bells & Whistles I: Radical Makeover</div>
+            <div class="text">
+                I changed my ethnicity and gender by morphing my face's shape and appearance with those of <a href="http://pmsol3.wordpress.com/2009/10/10/">average faces from the web</a>.
+                Below are some fun examples. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/me.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My face
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/ja.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Average Japanese female actress 
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/jap1.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My appearance & Japanese female shape  
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/jap2.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Japanese female appearance & my shape
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/jap3.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Midway image  
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/me.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My face
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/aa.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Average African-American female
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/eshape.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My appearance & African-American female shape  
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/eapp.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        African-American female appearance & my shape 
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/eboth.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Midway image 
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/me.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My face
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/ag.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Average Argentinian male 
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/gshape.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        My appearance & Argentinian male shape  
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/gapp.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Argentinian male appearance & my shape
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/gboth.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Midway image 
+                    </div>
+                </div>
+            </div>
+        </div>
+		<div class="elem">
+            <div class="text-title">Bells & Whistles II: Lauren's Hair</div>
+            <div class="text">
+                My friend Lauren loves to change the way her hair looks. Her profile pictures are waay more interesting than mine, so I chose to make a video of her through the years! 
+				Here are the parts of it. 
+			</div>
+			<div class="photo-elem">
+                <img class="photo" src="assets/img/l1.gif"/>
+            </div>
+			<div class="photo-elem">
+                <img class="photo" src="assets/img/l2.gif"/>
+            </div>
+			<div class="photo-elem">
+                <img class="photo" src="assets/img/l3.gif"/>
+            </div>
+			<div class="photo-elem">
+                <img class="photo" src="assets/img/l4.gif"/>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Conclusion</div>
+            <div class="text">
+                This project was really enjoyable for me. The most important thing that I learned was how powerful triangulations are: we couldn't have morphed this successfully without them!
+				<br>Additionally, I found the population mean calculations interesting because it is an pragmatic way to take advantage of all the images that exist on the internet. 
+			</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,774 @@
+<html>
+    
+<head>
+    <script src="assets/js/jquery-1.9.1.js"></script>
+    <script src="assets/js/script.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700&subset=latin,greek-ext' rel='stylesheet' type='text/css'>
+</head>
+    
+<body>
+    <div id="modal">
+        <div id="modal-overlay">
+        </div>
+        <div id="modal-content"> 
+            <div id="container">
+                <div class="image-container">
+                    <img id="photo-modal" src=""/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="header">
+        <div id="project-name">
+            Project 3: Fun with Frequencies!
+        </div>
+        <div id="class-name">
+            CS194-26 | Fall 14
+        </div>
+        <div id="name">
+            Vanessa Matalon
+        </div>
+    </div>
+    <div id="content">
+        <div class="elem">
+            <div class="text-title">Part 0: Unsharp Masking</div>
+            <div class="text">
+                This part of the project consisted of implementing an unsharp mask in order to sharpen an image of our choice. This technique gets its name from the fact that one uses an unsharp or blurred version of the original image in order to create a mask (of its high frequencies) that will be added to the original image to make a sharpened version of it. 
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                In order to blur the original image, I convolved the image with a Gaussian filter whose dimensions are a function of the image’s largest dimension and has a standard deviation of 2, 3, or 4 depending on the image. 
+                <br>I then subtracted the unsharpened image from the original in order to extract the high frequencies. 
+                <br>These were multiplied by some constant, alpha, and then added back to the original image, in order to produce an image whose high frequencies are emphasized. 
+                <br>
+                <br>Below are a few examples: the original image is on the left and the sharpened image is on the right.
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/selfie.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Selfie: original
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/selfie-sharpened.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Selfie: sharpened
+                    </div>
+                    <div class="description-info">
+                        alpha = 2
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/flower.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Flower: original
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/flower-sharpened.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Flower: sharpened
+                    </div>
+                    <div class="description-info">
+                        alpha = 3
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/arches.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Arches: original
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/arches-sharpened.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Arches: sharpened
+                    </div>
+                    <div class="description-info">
+                        alpha = 4
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">
+                Part 1: Hybrid Images   
+            </div>
+            <div class="text">
+                The idea was to make hybrid static images, whose interpretation changes as a function of viewing distance. The way to do this is to superimpose two images at different frequencies; the low frequency image will be visible at some predefined distance (or at a small size) and the high frequency image will be visible from up close. 
+                <br>I found it particularly interesting that the paper reported that people interpreted the low spatial frequency band before the high spatial frequency band, and when selecting a spatial frequency, they were not conscious of the information in the other spatial scale (p. 528). 
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                My favorite hybrid image was made using these two images. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/3l-blackswan.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Black Swan: original
+                    </div>
+                    <div class="description-info">
+                        (soon to be) 
+                        <br>low frequency
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/3h-amidala.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Queen Amidala: original
+                    </div>
+                    <div class="description-info">
+                        (soon to be) 
+                        <br>high frequency
+                    </div>
+                </div>
+            </div>
+            <div class="image-text">
+                The first step in the implementation was to align the images. 
+                <br>In this example, I used the function that was provided to us, which allowed me to select two points (in this case: the eyes) that should match up in both images. 
+                <br>For the rest of the hybrid images, I aligned the photos before running the algorithm. 
+            </div>
+            <div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/il.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Black Swan: aligned
+                        </div>
+                        <div class="description-info">
+                            (soon to be) 
+                            <br>low frequency
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/fftl.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Black Swan: aligned FFT
+                        </div>
+                        <div class="description-info">
+                            (soon to be) 
+                            <br>low frequency
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/ih.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Queen Amidala: aligned
+                        </div>
+                        <div class="description-info">
+                            (soon to be) 
+                            <br>high frequency
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/ffth.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Queen Amidala: aligned FFT
+                        </div>
+                        <div class="description-info">
+                            (soon to be) 
+                            <br>high frequency
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="image-text">
+                Next, we must determine the cutoff frequencies for each filter. These were selected via experimentation for each image and can be found under their descriptions. 
+                <br>These cutoff frequencies were used to determine what the standard deviation of the Gaussian filter should be: 
+                <br>sigma = 1/(2*pi*cutoff_frequency)
+                <br>
+                <br>Both images were symmetrically padded and then convolved with a Gaussian filter, as in the description above. 
+                <br>The dimensions of the Gaussian filter were again a function of the image's largest dimension, but the high frequency image's was twice the size of the low frequency image's.
+                <br>The blurred version of the high frequency image was subracted from the original (so that I could extract the high frequencies), but the low frequency image was left as is. 
+            </div>
+            <div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/imlofi.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Black Swan: filtered
+                        </div>
+                        <div class="description-info">
+                            low frequency
+                            <br>cutoff frequency: 0.025
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/fftlf.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Black Swan: filtered FFT
+                        </div>
+                        <div class="description-info">
+                            low frequency
+                            <br>cutoff frequency: 0.025
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="photo-pair">
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/imhifi.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Queen Amidala: filtered 
+                        </div>
+                        <div class="description-info">
+                            high frequency
+                            <br>cutoff frequency: 0.05
+                        </div>
+                    </div>
+                </div>
+                <div class="fourth-photo-elem">
+                    <img class="photo" src="assets/img/ffthf.jpg"/>
+                    <div class="description">
+                        <div class="description-title">
+                            Queen Amidala: filtered FFT
+                        </div>
+                        <div class="description-info">
+                            high frequency
+                            <br>cutoff frequency: 0.05
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="image-text">
+                Once the images were filtered, I added them together to form a hybrid image. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/hybrid-blackamidala.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Black Amidala
+                    </div>
+                    <div class="description-info">
+                        (cropped) hybrid image
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/ffthy.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Black Amidala: FFT
+                    </div>
+                    <div class="description-info">
+                        hybrid image
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                The images that worked best were the ones whose perceptual features aligned well.  
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/1l-face.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Happy
+                    </div>
+                    <div class="description-info">
+                        low frequency
+                        <br>cutoff frequency: 0.02
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/1h-face.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Neutral
+                    </div>
+                    <div class="description-info">
+                        high frequency
+                        <br>cutoff frequency: 0.04
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/hybrid-face.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Mixed Feelings I
+                    </div>
+                    <div class="description-info">
+                        hybrid image
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                The example below was not as successful because the black kiwi seeds are visible through the more homogenous grapefruit pulp.
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2a-kiwi.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Kiwi
+                    </div>
+                    <div class="description-info">
+                        low frequency
+                        <br>cutoff frequency: 0.02
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2b-grapefruit.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Grapefruit
+                    </div>
+                    <div class="description-info">
+                        high frequency
+                        <br>cutoff frequency: 0.05
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/hybrid_griwi.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Griwi I
+                    </div>
+                    <div class="description-info">
+                        hybrid image
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Part 2: Gaussian and Laplacian Stacks</div>
+            <div class="text">
+                In order to better observe images with details at multiple resolutions, we were asked to implement Gaussian and Laplacian stacks. 
+                <br>A Gaussian stack is implemented by convolving an image with a series of Gaussian or low-pass filters. 
+                <br>A Laplacian stack is built by subtracting each level of the constructed Gaussian stack from the next lowest one. Once you reach the last level of the Gaussian stack you set the last level equal of the Laplacian one equal to it. 
+                <br>This makes it so that adding the levels of the Laplacian stack gives you the original image.
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                My implementation consists of two functions. 
+                <br>The first constructs the Gaussian stack; its arguments are the image and the number of levels. It sets the original image to the first level of the stack and then iteratively convolves a padded version of the original image with a Gaussian filter whose size is a function of the original image's maximum dimension and whose sigma increases exponentially at each level. (The padding is necessary to remove aliasing at the edges of the image.) Finally, it extracts the image from the padded matrix and stores it at each level. 
+                <br>The Laplacian stack function takes in the Gaussian stack as its argument and iteratively subtracts the current level from the level below it until it reaches the second to last level. The last level is set equal to the Gaussian stack’s last level.   
+                <br>
+                <br>Below are some examples of stacks that I implemented. They were all 6 levels wide, but since both stacks share the last level, I chose to only display the first 5 levels. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/hybrid-blackamidala.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Black Amidala 
+                    </div>
+                    <div class="description-info">
+                        Original hybrid image
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/hyblow.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Gaussian stack: low frequencies 
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/hybhigh.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Laplacian stack: high frequencies 
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/MonaLisa.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Mona Lisa by da Vinci
+                    </div>
+                    <div class="description-info">
+                        Original
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/monalow.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Gaussian stack: low frequencies 
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/monahigh.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Laplacian stack: high frequencies 
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/DaliSkull.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        In Voluptas Mors by Dali
+                    </div>
+                    <div class="description-info">
+                        Original
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/skulllow.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Gaussian stack: low frequencies 
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/skullhigh.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Laplacian stack: high frequencies 
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/kissing.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Kissing by Alex Grey
+                    </div>
+                    <div class="description-info">
+                        Original
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/kissinglow.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Gaussian stack: low frequencies 
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/kissinghigh.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Laplacian stack: high frequencies 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Part 3: Multiresolution Blending</div>
+            <div class="text">
+                We were asked to implement a multiresolution spline technique.In this procedure, both images are decomposed into a set of filtered images and assembled in such a way that the transition between them is made slightly more gradual.
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                 In order to do this, I built Laplacian stacks for both images (LA and LB) and a Gaussian stack for the mask that will be used to combine them (GM). 
+                 <br>(I used the functions from the previous part of the project to complete this task.) 
+                 <br>Next, I built a combined Laplacian stack (LC) by combining LA and LB using the GM as a weights at each level (i):
+                 <br>LCi = GMi.*LAi + (1-GMi).*LBi
+                 <br>(Where the .* operator is Matlab's array multiply operator.)
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/4-emojisat.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Emosat
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/4a-emoji.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Emoji
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/4b-saturnstars.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Saturn
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/4c-mask.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Mask
+                    </div>
+                </div>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/emojistack.jpg"/>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/saturnstack.jpg"/>
+            </div>
+            <div class="long-photo-elem">
+                <img class="photo" src="assets/img/maskstack.jpg"/>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                It is really important that the images align well so that the blending is done smoothly. Here are some successful examples. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/3-morth.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Morth
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/3a-moon.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Moon
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/3b-earth.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Earth
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/3c-mask.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Mask
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/2-grapiwi.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Griwi II
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2a-kiwi.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Kiwi
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2b-grapefruit.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Grapefruit
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2c-mask.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Mask
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="image-text">
+                If the images doin't align up we get weird transitions, as is the case in the following image. If you focus on the lips, nose, and neck you will see that this images is not aesthetically pleasing. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/1-mixedfeeling.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Mixed Feelings
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/11.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Neutral
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/12.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Sad
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/13.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Mask
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Bells and Whistles</div>
+            <div class="text">
+                I implemented a color version of this algorithm as extra credit. 
+                <br>To do this, the only modification I had to make was to extract and blend each color channel on its own and then put them back together to make a color image. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/mosaiccolor3.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Emosat
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/4a-emoji.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Emoji
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/4b-saturnstars.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Saturn
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/4c-mask.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Mask
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/mosaiccolor2.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Morth
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/3a-moon.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Moon
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/3b-earth.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Earth
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/3c-mask.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Mask
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/mosaiccolor1.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Griwi II
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2a-kiwi.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Kiwi
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2b-grapefruit.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Grapefruit
+                    </div>
+                </div>
+            </div>
+            <div class="third-photo-elem">
+                <img class="photo" src="assets/img/2c-mask.jpg"/>
+                <div class="description">
+                    <div class="description-info">
+                        Mask
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Conclusion</div>
+            <div class="text">
+                It was really interesting to learn about the different ways to manipulate images by their frequencies. 
+                <br>My favorite part of the project was the image blending we did because it was not too complicated and nevertheless created very effortless blends. 
+            </div>
+        </div>
+    </div>
+</body>
+</html>

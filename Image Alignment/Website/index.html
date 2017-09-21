@@ -1,0 +1,434 @@
+<html>
+    
+<head>
+    <script src="assets/js/jquery-1.9.1.js"></script>
+    <script src="assets/js/script.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700&subset=latin,greek-ext' rel='stylesheet' type='text/css'>
+</head>
+    
+<body>
+    <div id="header">
+        <div id="project-name">
+            Project 1: Images of the Russian Empire
+        </div>
+        <div id="subtitle">
+            Colorizing the Prokudin-Gorskii photo collection
+        </div>
+        <div id="class-name">
+            CS194-26 | Fall 14
+        </div>
+        <div id="name">
+            Vanessa Matalon
+        </div>
+    </div>
+    <div id="content">
+        <div class="elem">
+            <div class="text-title">Overview</div>
+            <div class="text">
+In the early twentieth century, Prokudin-Gorskii was given special permission to travel across the Russian Empire and take photographs of what he saw. He came up with the idea to record three exposures of every scene using red, green, and blue filters so that he could then extract a color image. Luckily, digitized versions of these glass plates have been made available through the Library of Congress, and the goal of this assignment is to take the digitized glass plate images and, using image processing techniques, automatically produce a color rendering of the scene. The program that I have created, and will describe below, divides the glass plate image into thirds and aligns the second and third color (G and R) channels to the first (B) in order to get a color photo.
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Naive Approach</div>
+            <div class="text">
+The naive implementation I implemented exhaustively searches over a window of possible displacements ([-15:15] pixels) and scores each combination of x and y offsets using the Sum of Squared Differences (SSD) metric. In order to make my program more efficient, I decided to parallelize the computation by assigning different combinations of offsets to different threads. 
+<br><br>
+The JPEG images were sufficiently small for this naive implementation to run in ~400 milliseconds on the instructional machines in Cory Hall. 
+Below are the results for the naive approach on two of the four smaller images.</div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/noedge-cathedral.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Cathedral
+                    </div>
+                    <div class="description-info">
+                        R[x=3,y=12], G[x=2,y=5]
+                        <br>0.385 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/noedge-monastery.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Monastery
+                    </div>
+                    <div class="description-info">
+                        R[x=2,y=3], G[x=2,y=-3]
+                        <br>0.398 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Image Pyramid</div>
+            <div class="text">
+The larger TIFF images, on the other hand, were too large to use this algorithm so I used an image-pyramid to get an additional speedup resulting in a computation that took ~1 second to align both color channels. The image pyramid represents the image at multiple scales, scaled by a factor of two on each level, and processes the image starting from the coarsest level until it reaches the original resolution. 
+<br><br>
+My implementation resizes the image by a factor of two until the smallest dimension is at most 150 pixels. Once this threshold is reached, the program iteratively runs the naive alignment algorithm on the color channels searching over a window of displacements that is proportional to the depth of the recursion. The offsets that are returned by the naive algorithm are scaled by a factor of two and used to center the window of displacements that the next level will search through.
+<br><br>
+This algorithm was successful for most of the TIFF images. For example: </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/noedge-lady.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Lady
+                    </div>
+                    <div class="description-info">
+                        R[x=10,y=112], G[x=7,y=51]
+                        <br>1.079 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/noedge-selfie.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Selfie
+                    </div>
+                    <div class="description-info">
+                        R[x=36,y=173], G[x=29,y=78]
+                        <br>1.131 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title"></div>
+            <div class="text">
+Only two of the images did not align well:
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/noedge-emir.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Emir
+                    </div>
+                    <div class="description-info">
+                        R[x=-68,y=-119], G[x=24,y=48]
+                        <br>1.046 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/noedge-village.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Village
+                    </div>
+                    <div class="description-info">
+                        R[x=-80,y=0], G[x=-10,y=0]
+                        <br>1.110 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title"></div>
+            <div class="text">
+The problem with using pixel intensity is that these vary across the three channels, especially if the image is dominated by a single color, as in the case in these two images. 
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Edge Alignment</div>
+            <div class="text">
+Since the pixel intensities vary across the different color channels, I decided to use the Laplacian of Gaussian method of edge detection filter in Matlab as my features. I selected this filter because it gave good results experimentally and it tool less time to compute compared to some of the other filters.<br>
+This fixed the problem that that the two images above had, as is illustrated in the following images.  
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-emir.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Emir
+                    </div>
+                    <div class="description-info">
+                        R[x=41,y=106], G[x=24,y=49]
+                        <br>7.039 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-village.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Village
+                    </div>
+                    <div class="description-info">
+                        R[x=23,y=137], G[x=13,y=65]
+                        <br>7.705 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-cathedral.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Cathedral
+                    </div>
+                    <div class="description-info">
+                        R[x=3,y=12], G[x=2,y=5]
+                        <br>0.485 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-bridge.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Bridge
+                    </div>
+                    <div class="description-info">
+                        R[x=8,y=69], G[x=-2,y=14]
+                        <br>7.318 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-harvesters.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Harvesters
+                    </div>
+                    <div class="description-info">
+                        R[x=15,y=124], G[x=18,y=60]
+                        <br>7.208 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-lady.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Lady
+                    </div>
+                    <div class="description-info">
+                        R[x=12,y=116], G[x=8,y=55]
+                        <br>7.367 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-melons.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Melons
+                    </div>
+                    <div class="description-info">
+                        R[x=13,y=173], G[x=10,y=83]
+                        <br>7.334 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-monastery.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Monastery
+                    </div>
+                    <div class="description-info">
+                        R[x=2,y=3], G[x=2,y=-3]
+                        <br>0.516 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-onion_church.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Onion Church
+                    </div>
+                    <div class="description-info">
+                        R[x=36,y=107], G[x=27,y=51]
+                        <br>7.412 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-selfie.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Selfie
+                    </div>
+                    <div class="description-info">
+                        R[x=36,y=173], G[x=29,y=77]
+                        <br>7.560 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-settlers.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Settlers
+                    </div>
+                    <div class="description-info">
+                        R[x=-1,y=15], G[x=0,y=7]
+                        <br>0.468 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-three_generations.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Three Generations
+                    </div>
+                    <div class="description-info">
+                        R[x=10,y=108], G[x=13,y=48]
+                        <br>7.226 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-tobolsk.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Tobolsk
+                    </div>
+                    <div class="description-info">
+                        R[x=3,y=7], G[x=3,y=3]
+                        <br>0.466 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-flowerinvase.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Flowers
+                    </div>
+                    <div class="description-info">
+                        R[x=-14,y=120], G[x=-3,y=18]
+                        <br>7.188 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-train.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Train
+                    </div>
+                    <div class="description-info">
+                        R[x=32,y=85], G[x=7,y=41]
+                        <br>7.381 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-turkmen.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Turkmen
+                    </div>
+                    <div class="description-info">
+                        R[x=29,y=117], G[x=22,y=57]
+                        <br>7.273 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-altar.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Altar
+                    </div>
+                    <div class="description-info">
+                        R[x=23,y=90], G[x=18,y=42]
+                        <br>6.997 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-artroom.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Art Room
+                    </div>
+                    <div class="description-info">
+                        R[x=32,y=133], G[x=28,y=63]
+                        <br>6.908 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-crosses.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Crosses
+                    </div>
+                    <div class="description-info">
+                        R[x=14,y=156], G[x=14,y=59]
+                        <br>7.301 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-dagestanitypes.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Dagestani Types
+                    </div>
+                    <div class="description-info">
+                        R[x=4,y=90], G[x=3,y=9]
+                        <br>7.002 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-peasantgirls.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Peasant Girls
+                    </div>
+                    <div class="description-info">
+                        R[x=20,y=11], G[x=9,y=-16]
+                        <br>7.061 seconds
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/result-textiles.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Textiles
+                    </div>
+                    <div class="description-info">
+                        R[x=79,y=162], G[x=47,y=76]
+                        <br>7.130 seconds
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

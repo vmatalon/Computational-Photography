@@ -1,0 +1,444 @@
+<html>
+    
+<head>
+    <script src="assets/js/jquery-1.9.1.js"></script>
+    <script src="assets/js/script.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700&subset=latin,greek-ext' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div id="modal">
+        <div id="modal-overlay">
+        </div>
+        <div id="modal-content"> 
+            <div id="container">
+                <div class="image-container">
+                    <img id="photo-modal" src=""/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="header">
+        <div id="project-name">
+            Project 4: Seam Carving 
+        </div>
+        <div id="class-name">
+            CS194-26 | Fall 14
+        </div>
+        <div id="name">
+            Vanessa Matalon
+        </div>
+    </div>
+    <div id="content">
+        <div class="elem">
+            <div class="text-title">Introduction</div>
+            <div class="text">
+                This project is inspired by the work in 
+                <a href="assets/img/imret.pdf">this paper</a>
+                by Shai Avidan and Ariel Shamir. 
+                <br>
+                All of the images used are my own, unless otherwise noted. 
+                <br>
+                <br>The idea of seam carving allows for both reduction and expansion of images in content-aware manner, unlike the traditional techniques of cropping and streching.
+                <br>A seam is an 8-connected path of pixels on an image from top to bottom or left to right, depending on the dimension that is being altered. 
+                <br>The seam that will be removed or inserted is the one of least importance, as is defined by an energy function. This ensures that we remove or add pixels that do not alter the overall image structure in noticeable ways. 
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Seam Removal: Algorithm</div>
+            <div class="image-text">
+                My algorithm for removing seams consisted of iteratively finding the lowest energy seam and removing it until I reached the desired dimension. 
+                <br> 
+                <br>The energy function that I used to generate the majority of my images was a measure of gradient saliency that consisted of the sum of the absolute value of the partial derivative of the grayscaled image in the horizontal and vertical directions. 
+                <br>This function allows me to assign each pixel with a level of importance, which shall be used to find the seam with the lowest cumulative energy. 
+                <br>
+                <br>The optimal seam is found using dynammic programming in a process that is twofold:
+                <br>First, the function iterates through all pixels starting from the second row/column and computes the cumulative energy for all pixels by adding the current pixel's energy to the minimum energy of the pixels above/left of it.
+                <br>Second, it backtracks from the pixel with the least cumulative energy in the last row/column recording the indeces of the pixels that form a part of the optimal seam (least cumulative energy). If there is a tie, my algorithm breaks it by returning the index with the lowest value.
+                <br>
+                <br>The seam removal happens by adding the image information before and after the index specified in seam to a carved version of the image. 
+            </div>
+        </div>
+        <div class="elem">
+			<div class="text-title">Seam Removal: Images</div>
+            <div class="image-text">
+                Here are some examples of horizontally carved images. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/starfish.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Starfish: original
+                    </div>
+					<div class="description-info">
+                        768x576 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/starfish-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Starfish: carved
+                    </div>
+                    <div class="description-info">
+                        537x576 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/space.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Galactic Pyrotechnics on Display: original
+                    </div>
+                    <div class="description-info">
+                        <a href="http://www.jpl.nasa.gov/spaceimages/details.php?id=PIA18461">Source</a>
+                        <br>648x507 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/space-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Galactic Pyrotechnics on Display: carved
+                    </div>
+                    <div class="description-info">
+                        388x507 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/safari.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Safari: original
+                    </div>
+                    <div class="description-info">
+                        604x404 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/safari-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Safari: carved
+                    </div>
+                    <div class="description-info">
+                        362x404 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/realitytv.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Reality TV: original
+                    </div>
+                    <div class="description-info">
+                        878x573 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/realitytv-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Reality TV: carved
+                    </div>
+                    <div class="description-info">
+                        614x573 pixels
+                        <br>(Has some artifacts around the bottom left and right, but is still pretty successful in my opinion.)
+                    </div>
+                </div>
+            </div>
+            <div class="image-text">
+                <br>Here are some examples of vertically carved images. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/dancinghouse.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Dancing House: original
+                    </div>
+                    <div class="description-info">
+                        570x858 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/dancinghouse-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Dancing House: carved
+                    </div>
+                    <div class="description-info">
+                        570x600 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/elephant.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Elephant: original
+                    </div>
+                    <div class="description-info">
+                        604x404 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/elephant-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Elephant: carved
+                    </div>
+                    <div class="description-info">
+                        604x282 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/slopes2.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Slopes: original
+                    </div>
+                    <div class="description-info">
+                        384x1112 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/slopes2-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Slopes: carved
+                    </div>
+                    <div class="description-info">
+                        384x556 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/dresden.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Dresden: original
+                    </div>
+                    <div class="description-info">
+                        824x548 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/dresden-carved2.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Dresden: carved
+                    </div>
+                    <div class="description-info">
+                        824x383 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/cacti.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Cacti: original
+                    </div>
+                    <div class="description-info">
+                        768x511 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/cacti-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Cacti: carved
+                    </div>
+                    <div class="description-info">
+                        768x408 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/flowerbed.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Flower Bed: original
+                    </div>
+                    <div class="description-info">
+                        547x698 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/flowerbed-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Flower Bed: carved
+                    </div>
+                    <div class="description-info">
+                        547x488 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/art.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Graffiti: original
+                    </div>
+                    <div class="description-info">
+                        620x786 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/art-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Graffiti: carved
+                    </div>
+                    <div class="description-info">
+                        620x537 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/bridge.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Bridge: original
+                    </div>
+                    <div class="description-info">
+                        404x604 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/bridge-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Bridge: carved
+                    </div>
+                    <div class="description-info">
+                        404x362 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/eastasianlib.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        East Asian Library: original
+                    </div>
+                    <div class="description-info">
+                        768x511 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/eastasianlib-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        East Asian Library: carved
+                    </div>
+                    <div class="description-info">
+                        357x511 pixels
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Failiure Examples</div>
+            <div class="text">
+                Although my seam removal algorithm worked on most of the images I ran it on, it was not perfect. 
+                <br>Here are some of the more undesirable results. 
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/flowers.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Flowers: original
+                    </div>
+                    <div class="description-info">
+                        960x638 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/flowers-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Flowers: carved
+                    </div>
+                    <div class="description-info">
+                        576x638 pixels
+                        <br>Instead of removing more pixels from the left side or some of the space between the dead flower on the far right and the two central flowers, it chose to remove seams from main subject of the image. 
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/door2.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Door Details: original
+                    </div>
+                    <div class="description-info">
+                        721x480 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/door2-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Door Details: carved
+                    </div>
+                    <div class="description-info">
+                        504x480 pixels
+                        <br>The algorithm does a pretty good job of bringing the metallic plaques closer to the ridges, but the highly structured nature of the image makes it so that the fragmented lines become quite obvious.
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/marucha.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Marucha: original
+                    </div>
+                    <div class="description-info">
+                        522x778 pixels
+                    </div>
+                </div>
+            </div>
+            <div class="photo-elem">
+                <img class="photo" src="assets/img/marucha-carved.jpg"/>
+                <div class="description">
+                    <div class="description-title">
+                        Marucha: carved
+                    </div>
+                    <div class="description-info">
+                        522x466 pixels
+                        <br>It does not do a horrible job, but again it does not know what the figure is. Instead of removing seams from the background it removes them from my friend's body. 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="elem">
+            <div class="text-title">Conclusion</div>
+            <div class="text">
+                The most important thing I learned from this project was the idea of an energy function. I think the notion of scoring pixels with a level of importance is extremelly clever and is likely to be useful for many other applications as well. 
+            </div>
+        </div>
+    </div>
+</body>
+</html>
